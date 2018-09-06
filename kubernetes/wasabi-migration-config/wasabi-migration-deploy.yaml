@@ -1,0 +1,26 @@
+apiVersion: apps/v1 #  for k8s versions before 1.9.0 use apps/v1beta2  and before 1.8.0 use extensions/v1beta1
+kind: Deployment
+metadata:
+  name: wasabi-migration
+spec:
+  selector:
+    matchLabels:
+      app: wasabi
+      tier: migration
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: wasabi
+        tier: migration
+    spec:
+      containers:
+      - name: wasabi-migration
+        image: mycujoo/wasabi-migration:1.0
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        ports:
+        - containerPort: 8080

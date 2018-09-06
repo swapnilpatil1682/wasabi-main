@@ -1,0 +1,19 @@
+---
+  kind: Service
+  apiVersion: v1
+  metadata:
+    name: wasabi
+    namespace: wasabi
+    labels:
+      app: wasabi
+      tier: frontend
+  spec:
+    type: ClusterIP
+    sessionAffinity: ClientIP
+    selector:
+      app: wasabi
+      tier: frontend
+    ports:
+      - name: web
+        port: 80
+        targetPort: 8080

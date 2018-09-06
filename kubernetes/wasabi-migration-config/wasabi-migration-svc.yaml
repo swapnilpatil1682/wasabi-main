@@ -1,0 +1,15 @@
+---
+  kind: Service
+  apiVersion: v1
+  metadata:
+    name: wasabi-migration
+    namespace: wasabi
+    labels:
+      app: wasabi
+      tier: migration
+  spec:
+    type: ClusterIP
+    sessionAffinity: ClientIP
+    selector:
+      app: wasabi
+      tier: migration

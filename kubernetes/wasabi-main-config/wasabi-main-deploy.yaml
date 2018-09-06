@@ -1,0 +1,34 @@
+apiVersion: apps/v1 #  for k8s versions before 1.9.0 use apps/v1beta2  and before 1.8.0 use extensions/v1beta1
+kind: Deployment
+metadata:
+  name: wasabi-main
+spec:
+  selector:
+    matchLabels:
+      app: wasabi
+      tier: frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: wasabi
+        tier: frontend
+    spec:
+      containers:
+      - name: wasabi-main
+        image: mycujoo/wasabi-main:5.2
+        imagePullPolicy: Always
+        env: 
+        - name: WASABI_CONFIGURATION
+          value: "-Ddatabase.url.host=wasabi-mysql.wasabi -Ddatabase.url.port=3306 -Ddatabase.url.dbname=wasabi -Ddatabase.user=root -Ddatabase.password=XYr1ppek9Z   -Ddatabase.pool.connections.min=10
+  -Ddatabase.pool.connections.max=30 -DnodeHosts=cassandra.wasabi   -DtokenAwareLoadBalancingLocalDC=DC1  -Dapplication.http.port=8080"
+        - name: MYSQL_HOST
+          value: "wasabi-mysql.wasabi"
+        - name: NODE_HOST
+          value: "cassandra.wasabi"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        ports:
+        - containerPort: 8080

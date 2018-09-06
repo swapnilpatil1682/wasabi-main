@@ -1,0 +1,38 @@
+
+Creating build with out running test cases. Make sure you have installed npm and node. 
+
+./bin/wasabi.sh  -t false  build
+
+WASABI_CONFIGURATION="
+  -Ddatabase.url.host=wasabi-mysql 
+  -Ddatabase.url.port=3306
+  -Ddatabase.user=root
+  -Ddatabase.password=XYr1ppek9Z
+  -DnodeHosts=cassandra.wasabi"
+
+
+kctl run -it WASABI_CONFIGURATION="-Ddatabase.url.host=wasabi-mysql -Ddatabase.url.port=3306 -Ddatabase.user=root -Ddatabase.password=XYr1ppek9Z -DnodeHosts=cassandra.wasabi" mycujoo/wasabi-main:2.0
+
+kctl run  -it wasabi-main-test2 WASABI_CONFIGURATION="-Ddatabase.url.host=wasabi-mysql -Ddatabase.url.port=3306 -Ddatabase.user=root -Ddatabase.password=XYr1ppek9Z -DnodeHosts=cassandra.wasabi" --image mycujoo/wasabi-main:2.0
+
+java -jar -Dcassandra.migration.keyspace.name=wasabi_experiments -Dcassandra.migration.cluster.port=9042 -Dcassandra.migration.scripts.locations=filesystem:/wasabi/wasabi/bin/docker -Dcassandra.migration.cluster.contactpoints=cassandra.wasabi /cassandra-migration-0.9-jar-with-dependencies.jar migrate
+
+
+ALTER KEYSPACE  wasabi_experiments WITH REPLICATION =  { 'class' : 'SimpleStrategy', 'replication_factor' : '2' };
+ALTER KEYSPACE wasabi_experiments WITH REPLICATION = {'class' : 'NetworkTopologyStrategy', 'datacenter1' : '1'};
+
+
+CREATE KEYSPACE IF NOT EXISTS wasabi_experiments WITH replication = {'class' : 'SimpleStrategy', 'replication_factor' : '1'}
+
+ALTER wasabi_experiments nodetool repair -all 
+
+nodetool repair wasabi_experiments
+
+nodetool describecluster 
+
+
+ALTER KEYSPACE wasabi_experiments WITH REPLICATION =  { 'class' : 'NetworkTopologyStrategy', 'datacenter1' : 3 };
+
+
+alter TABLE experiment ADD source_url varchar;
+alter TABLE experiment ADD experiment_type varchar;
